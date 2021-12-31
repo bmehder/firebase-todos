@@ -52,6 +52,11 @@
 
   const deleteTodo = async todo => await deleteDoc(doc(db, 'todos', todo.id))
 
+  const updateTodo = todo => {
+    task = todo.task
+    deleteTodo(todo)
+  }
+
   const handleKeydown = e => e.key === 'Enter' && addTodo()
 </script>
 
@@ -59,13 +64,13 @@
 
 <main>
   <header>
-    <h1>Realtime Todo List ({todos.length})</h1>
+    <h1>Realtime Todo List <small>({todos.length})</small></h1>
   </header>
 
   <section>
     <input type="text" bind:value={task} placeholder="Add task..." />
     <button class="add-new" on:click={addTodo} disabled={!task}>Add New</button>
-    <Todos {todos} {markComplete} {deleteTodo} />
+    <Todos {todos} {markComplete} {deleteTodo} {updateTodo} />
   </section>
 </main>
 

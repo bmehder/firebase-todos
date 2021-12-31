@@ -2,13 +2,13 @@
   import { scale } from 'svelte/transition'
 
   export let todos = []
-  export let markComplete, deleteTodo
+  export let markComplete, deleteTodo, updateTodo
 </script>
 
 <ul>
   {#each todos as todo, index (todo.id)}
     <li transition:scale>
-      <span class:complete={todo.isComplete}>
+      <span class:complete={todo.isComplete} on:click={() => updateTodo(todo)}>
         {@html todo.task}
       </span>
       <span>
