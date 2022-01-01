@@ -6,10 +6,7 @@
     collection,
     onSnapshot,
     orderBy,
-    doc,
     addDoc,
-    updateDoc,
-    deleteDoc,
   } from 'firebase/firestore'
   import { firebaseConfig } from '$lib/firebaseConfig.js'
   import Todos from '$lib/Todos.svelte'
@@ -23,38 +20,24 @@
   let task = ''
 
   const unsubscribe = onSnapshot(q, querySnapshot => {
-    let fbTodos = []
+    let firebaseTodos = []
 
     querySnapshot.forEach(doc => {
       let todo = { ...doc.data(), id: doc.id }
-      fbTodos = [todo, ...fbTodos]
+      firebaseTodos = [todo, ...firebaseTodos]
     })
 
-    todos = fbTodos
+    todos = firebaseTodos
   })
 
   const addTodo = async () => {
     if (!task) return
 
-    const docRef = await addDoc(collection(db, 'todos'), {
-      task,
-      isComplete: false,
-      createdAt: new Date(),
-    })
+    const newTask = { task, isComplete: false, createdAt: new Date() }
+
+    const docRef = await addDoc(collection(db, 'todos'), newTask)
 
     task = ''
-  }
-
-  const markComplete = async todo =>
-    await updateDoc(doc(db, 'todos', todo.id), {
-      isComplete: !todo.isComplete,
-    })
-
-  const deleteTodo = async todo => await deleteDoc(doc(db, 'todos', todo.id))
-
-  const updateTodo = todo => {
-    task = todo.task
-    deleteTodo(todo)
   }
 
   const handleKeydown = e => e.key === 'Enter' && addTodo()
@@ -70,7 +53,7 @@
   <section>
     <input type="text" bind:value={task} placeholder="Add task..." />
     <button class="add-new" on:click={addTodo} disabled={!task}>Add New</button>
-    <Todos {todos} {markComplete} {deleteTodo} {updateTodo} />
+    <Todos bind:todos bind:task />
   </section>
 </main>
 
@@ -90,6 +73,9 @@
   header {
     text-align: center;
     color: hsl(210, 100%, 16%);
+  }
+  h1 {
+    margin-top: 0;
   }
   section {
     background: white;

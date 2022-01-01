@@ -1,8 +1,23 @@
 <script>
   import { scale } from 'svelte/transition'
+  import { getFirestore, doc, updateDoc, deleteDoc } from 'firebase/firestore'
+
+  const db = getFirestore()
 
   export let todos = []
-  export let markComplete, deleteTodo, updateTodo
+  export let task = ''
+
+  const markComplete = async todo =>
+    await updateDoc(doc(db, 'todos', todo.id), {
+      isComplete: !todo.isComplete,
+    })
+
+  const updateTodo = todo => {
+    task = todo.task
+    deleteTodo(todo)
+  }
+
+  const deleteTodo = async todo => await deleteDoc(doc(db, 'todos', todo.id))
 </script>
 
 <ul>
